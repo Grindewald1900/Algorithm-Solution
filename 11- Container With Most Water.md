@@ -39,7 +39,31 @@ Runtime: 373 ms, faster than 10.54% of Java online submissions for Container Wit
 Memory Usage: 39.9 MB, less than 94.87% of Java online submissions for Container With Most Water.
 
 ## Solution 2.0
+1. Make pointer1 scan from left and pointer2 scan form right.  
+2. Calculate the area size.  
+3. Move one of the pointers(the shorter side).  
+4. When the pointers meets, loop end.  
+```java
+class Solution {
+    public int maxArea(int[] height) {
+        int max = 0, temp = 0, h = 0;
+        int p1 = 0, p2 = height.length-1;
+        while(p1 < p2){
+            if(height[p1] < height[p2]){
+                h = height[p1];
+                p1++;
+            }else{
+                h = height[p2];
+                p2--;
+            }
+            temp = h*(p2-p1+1);
+            max = max < temp ? temp : max;
+        }
+        return max;
+    }
+}
 
-
-
-
+```
+Runtime: 1 ms, faster than 99.99% of Java online submissions for Container With Most Water.  
+Memory Usage: 40 MB, less than 94.87% of Java online submissions for Container With Most Water.
+https://leetcode.com/problems/container-with-most-water/solution/

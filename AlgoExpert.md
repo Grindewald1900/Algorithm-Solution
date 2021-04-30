@@ -374,3 +374,270 @@ fun spiralTraverse(array: List<List<Int>>): List<Int> {
     return results
 }
 ```
+
+#### 11.Longest Peak
+**Solution 1**
+```Kotlin
+
+// O(n) time | O(1) space
+// O(n) time since the covered elements in the while loop are monotonous, so that doesn't 
+// meet the condition of for loop outside
+fun longestPeak(array: List<Int>): Int {
+    if (array.size < 3) return 0
+    var currentLong = 0
+    var maxLong = 0
+    
+    for (i in 1..array.size - 2){
+        if (array[i-1] < array[i] && array[i+1] < array[i]){
+            currentLong ++
+            var left = i - 1
+            var right = i + 1
+
+            while (left >= 0 && array[left] < array[left+1]){
+                currentLong ++
+                left --
+            }
+            while (right < array.size && array[right] < array[right-1]){
+                currentLong ++
+                right ++
+            }
+            maxLong = max(currentLong, maxLong)
+            currentLong = 0
+        }
+    }
+    return maxLong
+}
+
+
+```
+
+#### 12.Array Of Product
+**Solution 1**
+```Kotlin
+// O(n) time | O(n) space
+fun arrayOfProducts(array: List<Int>): List<Int> {
+    val results = arrayListOf<Int>()
+    var product = 1
+
+    product = production(array)
+    array.forEach {
+        if (it != 0)
+            results.add(product / it)
+        else{
+            val temArray = array.toMutableList()
+            temArray.remove(0)
+            results.add(production(temArray))
+        }
+    }
+    return results
+}
+
+fun production(array: List<Int>): Int{
+    var product = 1
+    array.forEach {
+        product *= it
+    }
+    return product
+}
+```
+
+#### 13.First Duplicate Value
+**Solution 1**
+```Kotlin
+//O(n) time | O(1) space
+fun firstDuplicateValue(array: MutableList<Int>): Int {
+    var minIndex = array.size - 1
+    var result = -1
+
+    for (i in 0 until array.size){
+        if (i > minIndex) break
+        val item = array[0]
+        array.remove(item)
+        if (array.contains(item) && array.indexOf(item) + i < minIndex){
+            result = item
+            minIndex = array.indexOf(item) + i
+        }
+    }
+    return result
+}
+
+```
+
+#### 14.Merge Overlapping Intervals
+**Solution 1**
+```Kotlin
+// O(n^2) time | O(n) space
+fun mergeOverlappingIntervals(intervals: List<List<Int>>): List<List<Int>> {
+    val results = arrayListOf<List<Int>>()
+    val interval = intervals.toMutableList()
+
+    for (i in interval.indices){
+        var isOverlap = false
+        for(j in i+1 until interval.size){
+            if(isOverlap(interval[i], interval[j])){
+                isOverlap = true
+                interval[j] = mergeInterval(interval[i], interval[j])
+            }
+        }
+        if (!isOverlap) results.add(interval[i])
+    }
+    return results
+}
+
+fun isOverlap(intervalOne: List<Int>, intervalTwo: List<Int>): Boolean{
+    return (intervalOne[1] >= intervalTwo[0] && intervalOne[1] <= intervalTwo[1])||
+            (intervalTwo[1] >= intervalOne[0] && intervalTwo[1] <= intervalOne[1])
+}
+
+fun mergeInterval(intervalOne: List<Int>, intervalTwo: List<Int>): List<Int>{
+    return listOf(min(intervalOne[0], intervalTwo[0]), max(intervalOne[1], intervalTwo[1]))
+}
+
+```
+
+**Solution 2**
+```Kotlin
+// O(nlogn) time and O(n) space
+fun mergeOverlappingIntervals(intervals: List<List<Int>>): List<List<Int>> {
+    var index = 0
+    var tempInterval: List<Int>
+    var results = mutableListOf<List<Int>>()
+    var sortedIntervals = intervals.toMutableList().sortedWith(Comparator { i1, i2 ->  i1[0].compareTo(i2[0])})
+
+    tempInterval = sortedIntervals[0]
+    while (index < sortedIntervals.size - 1){
+        if (tempInterval[1] >= sortedIntervals[index+1][0]){
+            tempInterval = listOf(min(tempInterval[0], sortedIntervals[index+1][0]), max(tempInterval[1], sortedIntervals[index+1][1]))
+        }else{
+            results.add(tempInterval)
+            tempInterval = sortedIntervals[index+1]
+        }
+        index ++
+    }
+    results.add(tempInterval)
+    return results
+}
+```
+
+
+#### 15.Four Number Sum
+**Solution 1**
+```Kotlin
+
+// O(n^3) time and O(n) space
+fun fourNumberSum(array: MutableList<Int>, targetSum: Int): List<List<Int>> {
+    var results = mutableListOf<List<Int>>()
+    var indexOne = 0; var indexTwo = 1; var indexThree = 3; var indexFour = 4
+    if (array.size < 4) return listOf()
+
+    array.sort()
+
+    while (array.size > 3){
+        val temp = array[0]
+        array.removeAt(0)
+        val threeNumList = threeNumberSum(array.toMutableList(), targetSum - temp)
+        threeNumList.forEach {
+            results.add(listOf(temp, it[0], it[1], it[2]))
+        }
+    }
+    return results
+}
+
+fun threeNumberSum(array: MutableList<Int>, targetSum: Int): List<List<Int>>{
+    val results = mutableListOf<List<Int>>()
+
+    while (array.size > 2){
+        val temp = array[0]
+        array.removeAt(0)
+        val twoNumList = twoNumSum(array.toMutableList(), targetSum - temp)
+        if (twoNumList.isNotEmpty()){
+            twoNumList.forEach {
+                results.add(listOf(temp, it[0], it[1]))
+            }
+        }
+    }
+
+    return results
+}
+
+fun twoNumSum(array: MutableList<Int>, targetSum: Int): List<List<Int>>{
+    val results = mutableListOf<List<Int>>()
+
+    while (array.size > 1){
+        val temp = array[0]
+        array.removeAt(0)
+        if (array.contains(targetSum - temp)){
+            results.add(listOf(temp, targetSum - temp))
+            array.remove(targetSum - temp)
+        }
+    }
+
+    return results
+}
+```
+
+#### 16.Subarray Sort
+**Solution 1**
+```Kotlin
+// O(n) time | O(1) space
+fun subarraySort(array: List<Int>): List<Int> {
+    var leftIdx = 0
+    var rightIdx = array.size - 1
+    var localMax = 0
+    var localMin = 0
+
+    while (leftIdx < rightIdx){
+        if (array[leftIdx] > array[leftIdx+1] && array[rightIdx-1] > array[rightIdx]) break
+        if(rightIdx - leftIdx <= 1) return listOf<Int>(-1, -1)
+        if (array[leftIdx] <= array[leftIdx+1]) leftIdx ++
+        if (array[rightIdx-1] <= array[rightIdx]) rightIdx --
+    }
+    localMax = array[rightIdx]
+    localMin = array[leftIdx]
+    for (i in leftIdx..rightIdx){
+        localMax = max(localMax, array[i])
+        localMin = min(localMin, array[i])
+    }
+    while (leftIdx > 0 && array[leftIdx-1] > localMin){
+        leftIdx --
+    }
+    while (rightIdx < array.size - 1 && array[rightIdx+1] < localMax){
+        rightIdx ++
+    }
+
+    return listOf<Int>(leftIdx, rightIdx)
+}
+```
+
+
+#### 17.Largeset Range
+**Solution 1**
+```Kotlin
+// O(nlogn) time and O(1) space
+fun largestRange(array: List<Int>): Pair<Int, Int> {
+    if(array.size == 1) return Pair(array[0], array[0])
+    var leftIdx = 0
+    var rightIdx = 0
+    var currentRange = 1
+    var maxRange = 1
+    var start = 0
+
+    val sortedArray = array.toMutableList()
+    sortedArray.sort()
+    while (rightIdx < sortedArray.size - 1){
+        if (sortedArray[rightIdx+1] <= sortedArray[rightIdx] + 1){
+            currentRange = rightIdx + 1 - leftIdx
+        } else {
+            leftIdx = rightIdx + 1
+        }
+        if (currentRange > maxRange){
+            if(sortedArray[start] < sortedArray[start+currentRange]){
+                maxRange = currentRange
+            }
+            start = leftIdx
+        }
+        rightIdx ++
+    }
+    return Pair(sortedArray[start], sortedArray[start+maxRange])
+}
+```

@@ -641,3 +641,149 @@ fun largestRange(array: List<Int>): Pair<Int, Int> {
     return Pair(sortedArray[start], sortedArray[start+maxRange])
 }
 ```
+
+
+
+#### 18.Min Rewards
+**Solution 1**
+```kotlin
+// O(nlogn) time and O(n) space
+fun minRewards(scores: List<Int>): Int {
+    val sortedScores = scores.toMutableList()
+    val rewards = arrayListOf<Int>()
+
+    if (scores.size == 1) return 1
+    for (i in scores.indices) rewards.add(1)
+    sortedScores.sort()
+    sortedScores.forEach {
+        val index = scores.indexOf(it)
+        if (index > 0 && index < scores.size - 1){
+            if (scores[index-1] > it) 
+                rewards[index-1] = max(rewards[index] + 1, rewards[index-1])
+            if (scores[index+1] > it)
+                rewards[index+1] = max(rewards[index] + 1, rewards[index+1])
+        }
+    }
+    if (scores[0] > scores[1]) 
+        rewards[0] = rewards[1] + 1
+    if (scores[scores.size - 1] > scores[scores.size - 2]) 
+        rewards[scores.size - 1] = rewards[scores.size - 2] + 1
+    return rewards.sum()
+}
+```
+
+**Solution 2**
+```kotlin
+// O(n) time | O(n) space
+fun minRewards(scores: List<Int>): Int {
+    val rewards = MutableList(scores.size){1}
+    if (scores.size == 1) return 1
+    if (scores.size == 2) return 3
+    for (i in 1..scores.size - 2){
+        if(scores[i] < scores[i - 1] && scores[i] < scores[i + 1]){
+            var left = i - 1
+            var right = i + 1
+            while (left >= 0 && scores[left] > scores[left+1]){
+                rewards[left] = max(rewards[left+1] + 1, rewards[left])
+                left --
+            }
+            while (right <= scores.size - 1 && scores[right] > scores[right-1]){
+                rewards[right] = max(rewards[right-1] + 1, rewards[right])
+                right ++
+            }
+        }
+    }
+    return rewards.sum()
+}
+```
+
+
+**Solution 3**
+```kotlin
+// O(n) time | O(n) space
+fun minRewards(scores: List<Int>): Int {
+    val rewards = MutableList(scores.size){1}
+    if (scores.size == 1) return 1
+    if (scores.size == 2) return 3
+    for (i in 1 until scores.size){
+        if (scores[i] > scores[i-1]) rewards[i] = max(rewards[i-1] + 1, rewards[i])
+    }
+    for (i in scores.size - 2 downTo 0){
+        if (scores[i] > scores[i+1]) rewards[i] = max(rewards[i+1] + 1, rewards[i])
+    }
+    return rewards.sum()
+}
+```
+
+
+
+#### 19.Zigzag Traverse
+```kotlin
+// O(n) time | O(n) space
+fun zigzagTraverse(array: List<List<Int>>): List<Int> {
+    val width = array[0].size - 1
+    val height = array.size - 1
+    var leftEnd = Pair(0, 0)
+    var rightEnd = Pair(0, 0)
+    var isFromLeft = false
+    val results = mutableListOf<Int>()
+
+    for (i in 0..width + height){
+        val count = rightEnd.second - leftEnd.second
+        for (j in 0..count){
+            if (isFromLeft){
+                results.add(array[leftEnd.first - j][leftEnd.second + j])
+            }else{
+                results.add(array[rightEnd.first + j][rightEnd.second - j])
+            }
+        }
+        isFromLeft = !isFromLeft
+        leftEnd = if (leftEnd.first == height)
+            Pair(height, leftEnd.second + 1)
+        else
+            Pair(leftEnd.first + 1, 0)
+        rightEnd = if (rightEnd.second == width)
+            Pair(rightEnd.first + 1, width)
+        else
+            Pair(0, rightEnd.second + 1)
+
+    }
+    return results
+}
+```
+
+<a name="Part2"></a>
+### Binary Search Tree
+
+#### 1.Find Closest Value in BST
+```kotlin
+open class BST(value: Int) {
+    var value = value
+    var left: BST? = null
+    var right: BST? = null
+}
+
+var valueOne = 0
+var valueTwo = 0
+// Average O(logn) time | O(logn) space
+// Worst O(n) time | O(n) space
+fun findClosestValueInBst(tree: BST, target: Int): Int {
+    var result = 0
+    if(tree.left != null){
+        result = findClosestValueInBst(tree.left!!, target)
+        if(result > target) return result
+    }
+    if(tree.value < target) valueOne = tree.value
+    else valueTwo = tree.value
+
+    if (valueTwo != 0){
+        return if(abs(valueOne - target) < abs(valueTwo - target)) valueOne
+        else valueTwo
+    }
+    if(tree.right != null){
+        result = findClosestValueInBst(tree.right!!, target)
+        if(result > target) return result
+    }
+    return result
+}
+```

@@ -787,3 +787,99 @@ fun findClosestValueInBst(tree: BST, target: Int): Int {
     return result
 }
 ```
+
+
+
+<a name="Part3"></a>
+### Binary Tree
+
+#### 1.Branch Sums
+```kotlin
+open class BinaryTree(value: Int) {
+    var value = value
+    var left: BinaryTree? = null
+    var right: BinaryTree? = null
+}
+
+fun branchSums(root: BinaryTree): List<Int> {
+    var sumList:MutableList<Int> = mutableListOf()
+    // Write your code here.
+    getSums(root, 0, sumList)
+    return sumList
+}
+
+fun getSums(node: BinaryTree, temSum: Int, list: MutableList<Int>){
+    if (node.left != null){
+        getSums(node.left!!, temSum + node.value, list)
+    }
+    if (node.right != null){
+        getSums(node.right!!, temSum + node.value, list)
+    }
+    if (node.left == null && node.right == null){
+        list.add(temSum + node.value)
+    }
+}
+
+```
+
+#### 2.Node Depth
+```Kotlin
+open class BinaryTree(value: Int) {
+    var value = value
+    var left: BinaryTree? = null
+    var right: BinaryTree? = null
+}
+
+// O(n) time and O(n) space
+fun nodeDepths(root: BinaryTree): Int {
+    var depthList: MutableList<Int> = mutableListOf()
+    getDepth(root, 0, depthList)
+    print(depthList)
+    // Write your code here.
+    return depthList.sum()
+}
+
+fun getDepth(node: BinaryTree, temDepth: Int, depthList: MutableList<Int>){
+    depthList.add(temDepth)
+    if(node.left != null){
+        getDepth(node.left!!, temDepth + 1, depthList)
+    }
+    if (node.right != null){
+        getDepth(node.right!!, temDepth + 1, depthList)
+    }
+}
+```
+
+
+#### 3.Invert Binary Tree
+```Kotlin
+open class BinaryTree(value: Int) {
+    var value = value
+    var left: BinaryTree? = null
+    var right: BinaryTree? = null
+}
+
+// O(log(n)) space and O(n) time
+fun invertBinaryTree(tree: BinaryTree) {
+    // Write your code here.
+    if(tree.left != null && tree.right != null){
+        // Switch left and right node
+        val tempValue: BinaryTree = tree.left!!
+        tree.left = tree.right
+        tree.right = tempValue
+        invertBinaryTree(tree.left!!)
+        invertBinaryTree(tree.right!!)
+    }else if(tree.left != null){
+        // Only have left sub node
+        tree.right = tree.left
+        invertBinaryTree(tree.right!!)
+        tree.left = null
+    }else if(tree.right != null){
+        // Only have right sub node
+        tree.left = tree.right
+        invertBinaryTree(tree.left!!)
+        tree.right = null
+    }
+}
+
+```

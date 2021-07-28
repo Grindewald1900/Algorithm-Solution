@@ -883,3 +883,62 @@ fun invertBinaryTree(tree: BinaryTree) {
 }
 
 ```
+
+
+
+#### 4.Binary Tree Diameter
+```Kotlin
+// This is an input class. Do not edit.
+open class BinaryTree(value: Int) {
+    var value = value
+    var left: BinaryTree? = null
+    var right: BinaryTree? = null
+}
+
+// O(n) time and O(logn) space
+fun binaryTreeDiameter(tree: BinaryTree?): Int {
+    // Write your code here.
+	val (depth, diameter) = getLongestPath(tree)
+    return diameter
+}
+
+fun getLongestPath(tree: BinaryTree?): Pair<Int, Int>{
+    if (tree == null) return Pair(0, 0)
+    // Get info from left and right subtrees
+    val (depthLeft, diameterLeft) = getLongestPath(tree.left)
+    val (depthRight, diameterRight) = getLongestPath(tree.right)
+
+    val currentDepth = 1 + max(depthLeft, depthRight)
+    val maxDiameter = max(diameterLeft, diameterRight)
+    val currentDiameter = max(maxDiameter, depthLeft + depthRight)
+
+    return Pair(currentDepth, currentDiameter)
+}
+
+```
+
+
+#### 5.Find Successor
+```Kotlin
+// O(n) time and O(n) space
+// 1. Traverse the tree in in-order
+// 2. Put all the node in a list
+// 3. Find out the index of target node so that the index+1 would be its successor
+fun findSuccessor(tree: BinaryTree, node: BinaryTree): BinaryTree? {
+    traverseTree(tree, node)
+    if (nodeList.last() == node){
+        return null
+    }
+    return nodeList[nodeList.indexOf(node) + 1]
+}
+
+fun traverseTree(tree: BinaryTree, node: BinaryTree){
+    if(tree.left != null){
+        traverseTree(tree.left!!, node)
+    }
+    nodeList.add(tree)
+    if(tree.right != null){
+        traverseTree(tree.right!!, node)
+    }
+}
+```

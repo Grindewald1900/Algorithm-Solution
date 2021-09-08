@@ -942,3 +942,275 @@ fun traverseTree(tree: BinaryTree, node: BinaryTree){
     }
 }
 ```
+
+
+<a name="Part6"></a>
+### Graph
+
+#### 1.Depth-first Search
+```Kotlin
+//O(n) Space and O(n) time
+class Node(name: String) {
+    val name: String = name
+    val children = mutableListOf<Node>()
+    val stack = Stack<Node>()
+    fun depthFirstSearch(): List<String> {
+        // Write your code here.
+        val list = mutableListOf<String>()
+        stack.push(this)
+        while (!stack.isEmpty()){
+            val current = stack.pop()
+            list.add(current.name)
+            print("${current.name}  \n")
+
+           current.children.asReversed().forEach {
+                stack.push(it)
+           }
+        }
+        return list
+    }
+}
+```
+
+
+
+#### 2.Single Cycle Check
+```Kotlin
+// O(n) time and O(n) space
+fun hasSingleCycle(array: List<Int>): Boolean {
+    // Write your code here.
+    val copyList = mutableListOf<Int>()
+    var index = 0
+    copyList.addAll(0, array)
+
+    for (i in array.indices){
+        copyList[index] = 0
+        index += array[index]
+        index = checkBound(index, array.size)
+    }
+    index = checkBound(index, array.size)
+    copyList.forEach {
+        if (it != 0) return false
+    }
+    return index == 0
+}
+
+fun checkBound(index: Int, size: Int): Int{
+    var result: Int = index
+    if(index > size - 1)
+        result = index % size
+    if(index < 0)
+        result = index % size + size
+    return result
+}
+```
+
+
+
+#### 3.Breadth-first Search
+```Kotlin
+// O(n) time and O(logn) space
+var queue:Queue<Node> = LinkedList<Node>()
+class Node(name: String) {
+    val name: String = name
+    val children = mutableListOf<Node>()
+
+    fun breadthFirstSearch(): List<String> {
+        // Write your code here.
+		val result = mutableListOf<String>()
+		queue.add(this)
+		while(!queue.isEmpty()){
+			val temp = queue.poll()
+			result.add(temp.name)
+			temp.children.forEach{
+				queue.add(it)
+			}
+		}
+        return result
+    }
+}
+
+```
+
+
+
+#### 4. River Sizes
+```Kotlin
+var size = 0
+var mMatrix: ArrayList<ArrayList<Int>> = ArrayList()
+var height = 0
+var width = 0
+
+fun riverSizes(matrix: List<List<Int>>): List<Int> {
+    // Write your code here.
+    val result: MutableList<Int> = mutableListOf()
+    height = matrix.size
+    width = matrix[0].size
+    mMatrix.clear()
+    size = 0
+
+    for (i in 0 until height){
+        mMatrix.add(ArrayList(matrix[i]))
+    }
+
+    for (i in 0 until height){
+        for (j in 0 until width){
+            size = 0
+            if (mMatrix[i][j] == 1){
+                size++
+                mMatrix[i][j] = 0
+                ifNeighbourRiver(i, j)
+            }
+            if(size > 0){
+                result.add(size)
+            }
+        }
+    }
+    return result
+}
+
+fun ifNeighbourRiver(i: Int, j: Int){
+    if(j < width-1 && mMatrix[i][j+1] == 1){
+        size++
+        mMatrix[i][j+1] = 0
+        ifNeighbourRiver(i, j+1)
+    }
+    if(i < height-1 && mMatrix[i+1][j] == 1){
+        size++
+        mMatrix[i+1][j] = 0
+        ifNeighbourRiver(i+1, j)
+    }
+    if(j > 0 && mMatrix[i][j-1] == 1){
+        size++
+        mMatrix[i][j-1] = 0
+        ifNeighbourRiver(i, j-1)
+    }
+    if(i > 0 && mMatrix[i-1][j] == 1){
+        size++
+        mMatrix[i-1][j] = 0
+        ifNeighbourRiver(i-1, j)
+    }
+}
+
+```
+
+
+
+#### 5.Youngest Common Ancestor
+```Kotlin
+class AncestralTree(name: Char) {
+    val name = name
+    var ancestor: AncestralTree? = null
+}
+
+// O(n) time and O(logn) space
+fun getYoungestCommonAncestor(topAncestor: AncestralTree, descendantOne: AncestralTree, descendantTwo: AncestralTree): AncestralTree? {
+    // Write your code here.
+    var result: AncestralTree? = topAncestor
+    var pathOne = mutableListOf<AncestralTree>()
+    var pathTwo = mutableListOf<AncestralTree>()
+    getPathToRoot(descendantOne, pathOne)
+    getPathToRoot(descendantTwo, pathTwo)
+		print("pathOne \n")
+
+    pathOne.forEach{
+        val name = it.name
+		print("name $name\n")
+        pathTwo.forEach{
+			print(it.name)
+            if(it.name == name){
+                result = it
+				return result
+            }
+        }
+    }
+    return result
+}
+
+fun getPathToRoot(node: AncestralTree?, path: MutableList<AncestralTree>){
+    if(node!!.name != 'A'){
+        path.add(node)
+        getPathToRoot(node.ancestor!!, path)
+    }
+}
+```
+
+
+#### 6.Remove Islands
+```Kotlin
+
+// O(wh) time and O(wh) space
+lateinit var mMatrix: List<MutableList<Int>>
+var height = 0
+var width = 0
+fun removeIslands(matrix: List<MutableList<Int>>): List<MutableList<Int>> {
+    // Write your code here.
+    mMatrix = matrix
+    height = matrix.size
+    width = matrix[0].size
+
+    for(i in 0 until width){
+        labelLand(0, i)
+        labelLand(height-1, i)
+    }
+    for(i in 0 until height){
+        labelLand(i, 0)
+        labelLand(i, width-1)
+    }
+
+    for(i in 0 until height){
+        for(j in 0 until width){
+            if(mMatrix[i][j] == 1)
+                mMatrix[i][j] = 0
+            if(mMatrix[i][j] == 2)
+                mMatrix[i][j] = 1
+
+        }
+    }
+
+    return matrix
+}
+
+fun labelLand(i: Int, j: Int){
+    if(mMatrix[i][j] == 1){
+        mMatrix[i][j] = 2
+        if(i > 0)
+            labelLand(i - 1, j)
+        if(i < height-1)
+            labelLand(i + 1, j)
+        if(j > 0)
+            labelLand(i, j - 1)
+        if(j < width-1)
+            labelLand(i, j + 1)
+    }
+}
+```
+
+
+#### 7.Cycle In Graph
+```Kotlin
+/** Graph Question-7 **/
+// O(e) time and O(e) space
+var size = 0
+var isCycle = false
+fun cycleInGraph(edges: List<List<Int>>): Boolean {
+    // Write your code here.
+    size = edges.size
+    isCycle = false
+    for (i in edges.indices){
+        ifCycle(i, i, 0, edges)
+    }
+    return isCycle
+}
+
+fun ifCycle(vertex: Int, target: Int, level: Int, edges: List<List<Int>>){
+    if(level > size) return
+    edges[vertex].forEach {
+        if(it == target){
+            isCycle = true
+        }else{
+            ifCycle(it, target, level+1, edges)
+        }
+    }
+}
+```
